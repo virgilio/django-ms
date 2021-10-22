@@ -1,0 +1,4 @@
+[flake8]
+per-file-ignores =
+    test_*.py: E501
+    */migrations/*.py: E501

@@ -1,0 +1,19 @@
+docker build . -t gh-user-data -f docker/Dockerfile
+docker volume create --name gh_user_volume --opt type=none --opt device=<project_home>/app --opt o=bind
+docker run --rm --mount source=gh_user_volume,target=/app -p 8000:8000 gh-user-data ls --color
+docker run --rm --mount source=gh_user_volume,target=/app -p 8000:8000 gh-user-data python manage.py runserver 0.0.0.0:8000
+docker run --rm --mount source=gh_user_volume,target=/app -p 8000:8000 gh-user-data python manage.py migrate
+
+# For ceverage report
+docker run --rm --mount source=gh_user_volume,target=/app gh-user-data sh -c 'pip -q --disable-pip-version-check install coverage && coverage run --source="." manage.py test service && coverage report'
+
+
+docker build . -t gh-user-data -f docker/Dockerfile
+docker volume create --name gh_user_volume --opt type=none --opt device=<project_home>/app --opt o=bind
+docker run --rm --mount source=gh_user_volume,target=/app -p 8000:8000 gh-user-data ls --color
+docker run --rm --mount source=gh_user_volume,target=/app -p 8000:8000 gh-user-data python manage.py runserver 0.0.0.0:8000
+docker run --rm --mount source=gh_user_volume,target=/app -p 8000:8000 gh-user-data python manage.py migrate
+
+
+
+service/api/test_commons.py service/api/test_repository.py service/api/test_user.py service/libs/test_github.py service/management/commands/test_fetch_github_data.py service/test_models.py 

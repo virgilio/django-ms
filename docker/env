@@ -1,0 +1,8 @@
+SECRET_KEY=django-insecure-$ie-ysd+&0d1i!3953f!6w07am$4+-@ycpdds4m5em_c-kuke%
+DEBUG=True
+GITHUB_AUTH_TOKEN=
+DRF_PAGE_SIZE=10
+# DATABASE_ENGINE=
+# DATABASE_NAME=
+# DATABASE_HOST=
+# DATABASE_PORT=

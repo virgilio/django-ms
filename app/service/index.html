@@ -1,0 +1,109 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+<title>Github Scrapper</title>
+</head>
+<body>
+<div class="container">
+<h2 id="about">About</h2>
+<p>This project is a quick scrapper using Github API that saves data in a chosen database and
+exposes it through a REST API both built using Django Framework together with Django Rest Framework</p>
+<h2 id="quick-start-with-docker-">Quick Start (with docker)</h2>
+<ol>
+<li>Download the code :)</li>
+<li>Setup github api key on env files present at root directory</li>
+<li>Build image
+<code>docker build . -t gh-user-data -f docker/Dockerfile</code></li>
+<li>Run migrations<pre><code>docker run --rm --<span class="hljs-keyword">env</span>-<span class="hljs-keyword">file</span> docker/<span class="hljs-keyword">env</span> \
+        --mount <span class="hljs-keyword">source</span>=gh_user_volume,target=/app \
+        -p <span class="hljs-number">8000</span>:<span class="hljs-number">8000</span> gh-user-data \
+        <span class="hljs-keyword">python</span> manage.py migrate
+</code></pre></li>
+<li>Fetch some data (first 10 users and their repos)<pre><code>docker run --rm --<span class="hljs-keyword">env</span>-<span class="hljs-keyword">file</span> docker/<span class="hljs-keyword">env</span> \
+       --mount <span class="hljs-keyword">source</span>=gh_user_volume,target=/app \
+       gh-user-data <span class="hljs-keyword">python</span> manage.py fetch_github_data
+</code></pre></li>
+<li>Create a user so you can explore data in admin<pre><code>docker run --rm -it --<span class="hljs-keyword">env</span>-<span class="hljs-keyword">file</span> docker/<span class="hljs-keyword">env</span> \
+        --mount <span class="hljs-keyword">source</span>=gh_user_volume,target=/app gh-user-data \
+        <span class="hljs-keyword">python</span> manage.py createsuperuser
+</code></pre></li>
+<li>Run the server<pre><code>docker run --rm --<span class="hljs-keyword">env</span>-<span class="hljs-keyword">file</span> docker/<span class="hljs-keyword">env</span> \
+        --mount <span class="hljs-keyword">source</span>=gh_user_volume,target=/app \
+        -p <span class="hljs-number">8000</span>:<span class="hljs-number">8000</span> gh-user-data \
+        <span class="hljs-keyword">python</span> manage.py runserver <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>:<span class="hljs-number">8000</span>
+</code></pre></li>
+<li>Go to <code>http://localhost:8000/admin</code> or <code>http://localhost:8000/api/github/user</code></li>
+<li>Be happy :) </li>
+</ol>
+<h2 id="structure">Structure</h2>
+<p>The service is implemented using a Django project with one app that includes a
+<strong>Web Application</strong> that can be queried for information about about users and
+repositories through a REST API and a <strong>Django Command</strong> that can be executed to
+scrape data from <strong>Github api</strong>. </p>
+<h4 id="stack">Stack</h4>
+<ol>
+<li>Django</li>
+<li>rest_framework</li>
+<li>django_filters</li>
+</ol>
+<h4 id="rest-api-description">REST API description</h4>
+<pre><code>GET <span class="hljs-meta-keyword">/api/</span>github<span class="hljs-meta-keyword">/user/</span> - List all users
+GET <span class="hljs-meta-keyword">/api/</span>github<span class="hljs-meta-keyword">/user/</span><span class="hljs-params">&lt;uid&gt;</span>/ - Get a speficic user based on its uid (internal)
+GET <span class="hljs-meta-keyword">/api/</span>github<span class="hljs-meta-keyword">/user/</span>?search=<span class="hljs-params">&lt;query&gt;</span> - Search users (fields from available filters)
+GET <span class="hljs-meta-keyword">/api/</span>github<span class="hljs-meta-keyword">/user/</span>?<span class="hljs-params">&lt;field&gt;</span>=<span class="hljs-params">&lt;value&gt;</span> - Filter results by
+    login, location, name, email, company, bio, twitter_username,
+    repos__name, repos__full_name, repos__language,
+
+GET <span class="hljs-meta-keyword">/api/</span>github<span class="hljs-meta-keyword">/repository/</span> - List all repositories
+GET <span class="hljs-meta-keyword">/api/</span>github<span class="hljs-meta-keyword">/repository/</span><span class="hljs-params">&lt;uid&gt;</span>/ - Get a specific repository by uid (internal)
+GET <span class="hljs-meta-keyword">/api/</span>github<span class="hljs-meta-keyword">/repository/</span>?search=<span class="hljs-params">&lt;query&gt;</span> - Search repositoryes (fields from filters)
+GET <span class="hljs-meta-keyword">/api/</span>github<span class="hljs-meta-keyword">/repository/</span>?<span class="hljs-params">&lt;field&gt;</span>=<span class="hljs-params">&lt;value&gt;</span> - Filter results by
+    name, full_name, language, description, license_name, owner
+</code></pre><h4 id="last-coverage-report">Last coverage report</h4>
+<pre><code>Name                                                          Stmts   Miss  Cover
+---------------------------------------------------------------------------------
+manage.py                                                         <span class="hljs-number">5</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/__init__.py                                              <span class="hljs-number">19</span>      <span class="hljs-number">2</span>    <span class="hljs-number">89</span>%
+service/api/__init__.py                                          <span class="hljs-number">11</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/api/commons.py                                           <span class="hljs-number">42</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/api/repository.py                                        <span class="hljs-number">22</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/api/user.py                                              <span class="hljs-number">30</span>      <span class="hljs-number">1</span>    <span class="hljs-number">97</span>%
+service/libs/__init__.py                                          <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/libs/github.py                                           <span class="hljs-number">38</span>      <span class="hljs-number">1</span>    <span class="hljs-number">97</span>%
+service/management/__init__.py                                    <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/management/commands/__init__.py                           <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/management/commands/fetch_github_data.py                 <span class="hljs-number">25</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/<span class="hljs-number">0001</span>_initial.py                                <span class="hljs-number">7</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/<span class="hljs-number">0002</span>_auto_20211025_2113.py                     <span class="hljs-number">5</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/<span class="hljs-number">0003</span>_alter_githubrepository_user.py            <span class="hljs-number">5</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/<span class="hljs-number">0004</span>_alter_githubuser_blog.py                  <span class="hljs-number">4</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/<span class="hljs-number">0005</span>_alter_githubrepository_homepage.py        <span class="hljs-number">4</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/<span class="hljs-number">0006</span>_auto_20211026_2212.py                     <span class="hljs-number">4</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/<span class="hljs-number">0007</span>_remove_githubrepository_watchers.py       <span class="hljs-number">4</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/<span class="hljs-number">0008</span>_auto_20211029_0004.py                     <span class="hljs-number">4</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/migrations/__init__.py                                    <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/models.py                                                <span class="hljs-number">66</span>      <span class="hljs-number">8</span>    <span class="hljs-number">88</span>%
+service/tests/__init__.py                                         <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/tests/api/__init__.py                                     <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/tests/api/test_repository.py                             <span class="hljs-number">19</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/tests/api/test_user.py                                   <span class="hljs-number">73</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/tests/libs/__init__.py                                    <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/tests/libs/test_github.py                                <span class="hljs-number">20</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/tests/management/__init__.py                              <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/tests/management/commands/__init__.py                     <span class="hljs-number">0</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+service/tests/management/commands/test_fetch_github_data.py      <span class="hljs-number">36</span>      <span class="hljs-number">0</span>   <span class="hljs-number">100</span>%
+---------------------------------------------------------------------------------
+TOTAL                                                           <span class="hljs-number">443</span>     <span class="hljs-number">12</span>    <span class="hljs-number">97</span>%
+</code></pre><h4 id="next-steps">Next Steps</h4>
+<ul>
+<li>API: provide out of the box authentication/authorization for API</li>
+<li>API: allow enabling/disabling of admin site for leaner production deployments</li>
+<li>Scrapper: work with the since parameter of Github API to allow more specific scrapping strategies</li>
+<li>Scrapper: make it possible to run it in parallel</li>
+</ul>
+</div>
+</body>
+</html>
